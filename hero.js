@@ -176,11 +176,36 @@ var moves = {
   // This hero will try really hard not to die.
   coward : function(gameData, helpers) {
     return helpers.findNearestHealthWell(gameData);
+  },
+
+  // Custom Hero
+  custom : function (gameData, helpers){
+    var myHero = gameData.activeHero;
+
+    var healthWellStats = helpers.findNearestObjectDirectionAndDistance(gameData.board, myHero, function(boardTile) {
+      if (boardTile.type === 'HealthWell') {
+        return true;
+      }
+    });
+
+    var distanceToHealthWell = healthWellStats.distance;
+    var directionToHealthWell = healthWellStats.direction;
+
+    if (myHero.health <= 30){
+      // If it is, head towards the nearest health well
+      return helpers.findNearestHealthWell(gameData);
+    } else if (myHero.health < 100 && distanceToHealthWell === 2) {
+      return directionToHealthWell;
+    } else  {
+      // Attack nearest weaker enemy
+      //console.log(gameData)
+      return helpers.findNearestWeakerEnemy(gameData);
+    }
   }
  };
 
 //  Set our heros strategy
-var  move =  moves.aggressor;
+var  move =  moves.custom;
 
 // Export the move function here
 module.exports = move;
